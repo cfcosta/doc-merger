@@ -34,16 +34,18 @@ info() {
   echo "$(color 2 "$(log_prefix)") ${@}"
 }
 
-#[[ -z $(git status -s) ]] || die "The working tree is dirty. Please make sure it is clean before running."
+[[ -z $(git status -s) ]] || die "The working tree is dirty. Please make sure it is clean before running."
 
-set -x
+set -e
 
 tempdir=$(mktemp -d)
 trap "{ rm -rf ${tempdir}; }" EXIT
 
 for tag in $(git tag --list); do
+  info "Preparing documentation for version ${tag}"
   git checkout ${tag}
   cp README.md $tempdir/${tag}.md
 done
 
+rm -rf old
 cp -rf $tempdir old
