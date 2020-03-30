@@ -48,7 +48,8 @@ info "Running for versions: $(git tag --list | paste -sd "," -)"
 for tag in $(git tag --list); do
   info "Preparing documentation for version ${tag}"
   ${GIT} checkout ${tag}
-  cp README.md $tempdir/${tag}.md
+  mkdir ${tempdir}/${tag}
+  cp README.md ${tempdir}/${tag}/
   ${GIT} checkout ${current_branch}
 done
 
