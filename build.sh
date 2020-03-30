@@ -1,5 +1,3 @@
-mkdir -p old
-
 color() {
   local color="\e[3${1}m"
   local reset="\e[0m"
@@ -38,13 +36,20 @@ info() {
 
 set -e
 
+GIT="git -c advice.detachedHead=false"
+
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+trap "{ $(GIT) checkout ${current_branch}; }" EXIT
+
 tempdir=$(mktemp -d)
 trap "{ rm -rf ${tempdir}; }" EXIT
 
+info "Running for versions: $(git tag --list | paste -sd "," -)"
 for tag in $(git tag --list); do
   info "Preparing documentation for version ${tag}"
-  git checkout ${tag}
+  ${GIT} checkout ${tag}
   cp README.md $tempdir/${tag}.md
+  ${GIT} checkout ${current_branch}
 done
 
 rm -rf old
